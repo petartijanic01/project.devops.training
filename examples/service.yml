@@ -1,0 +1,17 @@
+# example Kubernetes service manifest
+# if correctly configured you should be able to access the deployment on chosen nodePort (select one value randomly between 30000-32767)
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+  labels:
+    app: myapp
+spec:
+  selector:
+    app: myapp
+  ports:
+    - name: http
+      port: 80
+      targetPort: 4000
+      nodePort: 30001
+  type: NodePort
