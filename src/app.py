@@ -8,7 +8,7 @@ app = Flask(__name__)
 def index():
     """homepage"""
     # Use the GREETING environment variable if set
-    greeting = os.environ.get('GREETING', 'Hello, Continuous Delivery!')
+    greeting = os.environ.get('GREETING', 'Hello from Petar Tijanic final project :), Continuous Delivery! :)')
     return greeting
 
 if __name__ == '__main__':
