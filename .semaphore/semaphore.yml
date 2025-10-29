@@ -1,13 +1,52 @@
 version: v1.0
-name: Initial Pipeline
+name: CI Pipeline
 agent:
   machine:
     type: f1-standard-2
     os_image: ubuntu2204
+global_job_config:
+  prologue:
+    commands:
+      - sem-version python 3.10
+      - checkout
+      - mkdir -p .pip_cache
+      - cache restore
+      - pip install --cache-dir .pip_cache -r requirements.txt
 blocks:
-  - name: 'Block #1'
+  - name: Setup and Cache
+    dependencies: []
     task:
       jobs:
-        - name: 'Job #1'
+        - name: Install Dependencies
           commands:
-            - checkout
+            - cache store
+  - name: Lint
+    dependencies:
+      - Setup and Cache
+    task:
+      jobs:
+        - name: Lint
+          commands:
+            - pip install pylint
+            - pylint src
+  - name: Dependency security scanning
+    dependencies:
+      - Lint
+    task:
+      jobs:
+        - name: Dependency security scanning
+          commands:
+            - sudo apt update
+            - sudo apt install -y python3.10-venv
+            - pip install pip-audit
+            - pip-audit -r requirements.txt
+  - name: Generate SBOM
+    dependencies:
+      - Dependency security scanning
+    task:
+      jobs:
+        - name: Generate SBOM
+          commands:
+            - pip install cyclonedx-bom
+            - cyclonedx-py requirements -o bom.json
+            - artifact push workflow bom.json
