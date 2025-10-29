@@ -59,7 +59,7 @@ promotions:
   - name: Build docker image
     pipeline_file: pipeline_2.yml
     auto_promote:
-      when: 'when: branch = ''main'' AND result = ''passed'''
+      when: 'when: "branch == ''main'' AND result == ''passed''"'
     parameters:
       env_vars:
         - required: true
