@@ -50,18 +50,8 @@ blocks:
             - pip install cyclonedx-bom
             - cyclonedx-py requirements -o bom.json
             - artifact push workflow bom.json
-after_pipeline:
-  task:
-    jobs:
-      - name: 'Job #1'
-        commands: []
 promotions:
-  - name: Build docker image
+  - name: Build Image
     pipeline_file: pipeline_2.yml
-    parameters:
-      env_vars:
-        - required: true
-          options: []
-          default_value: ''
-          description: ''
-          name: ''
+    auto_promote:
+      when: branch = 'main' AND result = 'passed'
