@@ -1,13 +1,26 @@
 version: v1.0
-name: Pipeline 2
+name: Build Docker image
 agent:
   machine:
-    type: e1-standard-2
+    type: f1-standard-2
     os_image: ubuntu2004
+global_job_config:
+  prologue:
+    commands:
+      - checkout
 blocks:
-  - name: 'Block #1'
+  - name: Build Docker Image
     task:
       jobs:
-        - name: 'Job #1'
+        - name: Build Docker Image
           commands:
-            - echo "job 1"
+            - echo $DOCKER_PASSWORD | docker login --username "$DOCKER_USERNAME" --password-stdin
+            - 'docker build -t "$DOCKER_USERNAME"/devops-project:${SEMAPHORE_WORKFLOW_ID} .'
+            - 'docker push "$DOCKER_USERNAME"/devops-project:${SEMAPHORE_WORKFLOW_ID}'
+      secrets:
+        - name: DockerHub
+promotions:
+  - name: Deploy
+    pipeline_file: pipeline_3.yml
+    auto_promote:
+      when: branch = 'main' AND result = 'passed'
